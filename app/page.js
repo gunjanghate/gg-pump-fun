@@ -20,13 +20,21 @@ export default function Home() {
   const [factory, setfactory] = useState(null)
   const [fee, setfee] = useState(0)
   const [showCreate, setshowCreate] = useState(false)
+  const [token, setToken] = useState(null)
+  const [tokens, setTokens] = useState([])
+  const [showtrade, setshowTrade] = useState(false)
+
 
   function toggleCreate() {
-     showCreate ? setshowCreate(false) : setshowCreate(true);
-    // Logic to toggle create token modal or component
+    showCreate ? setshowCreate(false) : setshowCreate(true);
+  }
+  function toggleTrade(token) {
+    setToken(token);
+    showtrade ? setshowTrade(false) : setshowTrade(true);
+    
   }
 
-  async function loadBlockchainData(){
+  async function loadBlockchainData() {
     const provider = new ethers.BrowserProvider(window.ethereum)
     setprovider(provider);
     const network = await provider.getNetwork();
@@ -38,40 +46,85 @@ export default function Home() {
     console.log("Factory Contract:", factory);
     setfactory(factory);
 
-    const fee = await factory.fee(); 
+    const fee = await factory.fee();
     console.log("Factory Fee:", fee);
     setfee(fee);
 
+    const totalTokens = await factory.totaltokens();
+    const tokens = [];
+    for (let i = 0; i < totalTokens; i++) {
+      const tokenSale = await factory.getTokenSales(i);
+
+      const token = {
+        token: tokenSale.token,
+        name: tokenSale.name,
+        creator: tokenSale.creator,
+        sold: tokenSale.sold,
+        raised: tokenSale.raised,
+        isOpen: tokenSale.isOpen,
+        image: images[i]
+      }
+      tokens.push(token);
+
+    }
+        setTokens(tokens.reverse())
 
   }
 
   useEffect(() => {
-      loadBlockchainData()
+    loadBlockchainData()
   }, [])
-  
+
   return (
     <div className="page">
-      <Header account={account} setAccount={setAccount}/>
+      <Header account={account} setAccount={setAccount} />
       <main>
 
         <div className="create">
-          <button onClick={factory && account && toggleCreate} className="btn--fancy"> 
+          <button onClick={factory && account && toggleCreate} className="btn--fancy">
 
-          {!factory?(
-            "[Contract Not deployed]"
-            
-          ) : !account?(
-            "[Please connect]"
-          ):(
-            "[Start a new token]"
-          )}
+            {!factory ? (
+              "[Contract Not deployed]"
+
+            ) : !account ? (
+              "[Please connect]"
+            ) : (
+              "[Start a new token]"
+            )}
           </button>
         </div>
+         <div className="listings">
+          <h1>new listings</h1>
+
+          <div className="tokens">
+            {!account ? (
+              <p>please connect wallet</p>
+            ) : tokens.length === 0 ? (
+              <p>No tokens listed</p>
+            ) : (
+              tokens.map((token, index) => (
+                <Token
+                  toggleTrade={toggleTrade}
+                  token={token}
+                  key={index}
+                />
+              ))
+            )}
+          </div>
+        </div>
+
+
+          
       </main>
       {showCreate &&
-      <>
-      <List toggleCreate={toggleCreate} fee={fee} provider={provider} factory={factory}/>
-      </>
+        <>
+          <List toggleCreate={toggleCreate} fee={fee} provider={provider} factory={factory} />
+        </>
+      }
+      {showtrade &&
+        <>
+          <Trade toggleTrade={toggleTrade} token={token} provider={provider} factory={factory}/>
+        </>
       }
 
     </div>

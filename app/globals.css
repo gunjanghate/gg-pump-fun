@@ -235,6 +235,8 @@ main .listings h1 {
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.9);
+  overflow-y: scroll;
+  scrollbar-width: none;
 
   position: fixed;
   top: 50%;
@@ -243,8 +245,20 @@ main .listings h1 {
 
   display: flex;
   align-items: center;
+  justify-content: center;
+  margin: auto;
+  flex-direction: row;
+  gap: 2em;
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+.trade_form{
+  display: flex;
   flex-direction: column;
-  padding-top: 3em;
+  gap: 2em;
+   align-items: center;
+  justify-content: center;
+  
 }
 
 .trade p {
