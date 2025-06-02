@@ -114,10 +114,11 @@ main .listings h1 {
 }
 
 .tokens {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 0));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1em;
-  place-content: center;
+  justify-content: center;
+  align-items: flex-start;
   text-align: center;
 }
 
